@@ -1,0 +1,34 @@
+#include <stdio.h>
+
+int main() {
+    int input_number;
+    scanf("%d", &input_number);
+    
+    // If the input is 0 or negative, just print a newline and exit
+    if (input_number <= 0) {
+        printf("\n");
+        return 0;
+    }
+
+    // Handle the special case where input_number is 1
+    if (input_number == 1) {
+        printf("1\n");
+        return 0;
+    }
+
+    int i = 1;
+    int first_divisor = 1;  // Used to track whether it's the first divisor
+    while (i < input_number) {  // Loop through numbers from 1 to input_number - 1
+        if (input_number % i == 0) {
+            if (first_divisor) {
+                printf("%d", i); // Print the first divisor without a leading space
+                first_divisor = 0; // Update flag after printing the first divisor
+            } else {
+                printf(" %d", i); // Print a space before subsequent divisors
+            }
+        }
+        ++i;
+    }
+    printf("\n"); // Ensure the output ends with a newline
+    return 0;
+}
