@@ -1,0 +1,25 @@
+#include <stdio.h>
+
+void probabilityOfRoll()
+{
+    int number;
+    printf("Enter a number between 2 and 12: ");
+    scanf("%d", &number);
+
+    if (number < 2 || number > 12)
+    {
+        printf("Number out of range.\n");
+        return;
+    }
+
+    int probabilities[13] = {0, 0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1};
+    double probability = (double)probabilities[number] / 36.0 * 100.0;
+
+    printf("The probability of rolling a %d is %.2f%%\n", number, probability);
+}
+
+int main()
+{
+    probabilityOfRoll();
+    return 0;
+}
