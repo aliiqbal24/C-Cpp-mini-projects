@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int sum = 0, digit, count = 0, check_digit;
+    int current_digit;
+    char ch;
+
+    while ((ch = getchar()) >= '0' && ch <= '9')
+    {
+        digit = ch - '0';
+        if (count == 0)
+        {
+            check_digit = digit;
+        }
+        else
+        {
+            if (count % 2 == 1)
+            {
+                current_digit = digit * 2;
+                if (current_digit >= 10)
+                {
+                    current_digit -= 9;
+                }
+            }
+            else
+            {
+                current_digit = digit;
+            }
+            sum += current_digit;
+        }
+        count++;
+    }
+
+    sum *= 9;
+    if ((sum % 10) == check_digit)
+    {
+        printf("Valid\n");
+    }
+    else
+    {
+        printf("Invalid\n");
+    }
+
+    return 0;
+}
