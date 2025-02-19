@@ -1,0 +1,129 @@
+#include <stdio.h>
+#include <string.h>
+
+// Colour definitions and globals
+const char *const GREEN = "\x1b[32m";
+const char *const YELLOW = "\x1b[33m";
+const char *const WHITE = "\x1b[0m";
+
+// We'll initialize current in main.
+const char *current;
+
+void setColour(const char *colour)
+{
+  if (current == colour)
+    return;
+  printf("%s", colour);
+  current = colour;
+}
+
+#define MAX_WORD_LEN 12
+
+// Colour types for internal processing
+#define COL_WHITE 0
+#define COL_YELLOW 1
+#define COL_GREEN 2
+
+int main(int argc, char **argv)
+{
+  if (argc != 2)
+  {
+    printf("Usage: %s word\n", argv[0]);
+    return 1;
+  }
+
+  // Initialize current to WHITE at program start.
+  current = WHITE;
+
+  // theWord points to the secret code word
+  char *theWord = argv[1];
+  int secret_len = strlen(theWord);
+
+  // Pre-compute the frequency of each character in the secret word.
+  int secret_counts[256] = {0};
+  for (int i = 0; i < secret_len; i++)
+  {
+    secret_counts[(unsigned char)theWord[i]]++;
+  }
+
+  // We allow up to 6 guesses.
+  int guess_number = 0;
+  while (guess_number < 6)
+  {
+    guess_number++;
+
+    // Prompt the user for a guess.
+    printf("Enter guess: ");
+    fflush(stdout);
+
+    // Since the code word is never more than 12 letters, we use a buffer of size 13.
+    char guess[MAX_WORD_LEN + 1];
+    if (scanf("%12s", guess) != 1)
+    {
+      // In case of input error, exit.
+      break;
+    }
+
+    // Prepare an array to hold the colour for each letter.
+    int letter_color[MAX_WORD_LEN] = {0}; // default COL_WHITE
+    int green_counts[256] = {0};          // count greens for each letter
+    int yellow_counts[256] = {0};         // count yellows for each letter
+
+    // First pass: mark greens (correct letter in correct position)
+    for (int i = 0; i < secret_len; i++)
+    {
+      if (guess[i] == theWord[i])
+      {
+        letter_color[i] = COL_GREEN;
+        green_counts[(unsigned char)guess[i]]++;
+      }
+    }
+
+    // Second pass: mark yellows (letter exists in secret but in wrong position)
+    for (int i = 0; i < secret_len; i++)
+    {
+      if (letter_color[i] == COL_GREEN)
+        continue; // already correct
+
+      unsigned char c = guess[i];
+      int available = secret_counts[c] - green_counts[c];
+      if (available > yellow_counts[c])
+      {
+        letter_color[i] = COL_YELLOW;
+        yellow_counts[c]++;
+      }
+    }
+
+    // Print the coloured guess letter-by-letter.
+    for (int i = 0; i < secret_len; i++)
+    {
+      if (letter_color[i] == COL_GREEN)
+      {
+        setColour(GREEN);
+      }
+      else if (letter_color[i] == COL_YELLOW)
+      {
+        setColour(YELLOW);
+      }
+      else
+      {
+        setColour(WHITE);
+      }
+      printf("%c", guess[i]);
+    }
+    // Reset colour to white and print newline.
+    setColour(WHITE);
+    printf("\n");
+
+    // Check if the guess matches the secret word.
+    if (strcmp(guess, theWord) == 0)
+    {
+      printf("Finished in %d guesses\n", guess_number);
+      return 0;
+    }
+  }
+
+  // If all 6 guesses are used without a correct guess.
+  printf("Failed to guess the word: %s\n", theWord);
+  return 0;
+}
